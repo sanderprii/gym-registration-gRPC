@@ -1,0 +1,384 @@
+syntax = "proto3";
+
+package gym_registration;
+
+// Import for timestamp
+import "google/protobuf/timestamp.proto";
+
+// ============================================================================
+// Common Types and Messages
+// ============================================================================
+
+// Pagination for list operations
+message PaginationRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message PaginationResponse {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total = 3;
+}
+
+// Error handling
+message ErrorResponse {
+  string message = 1;
+  int32 code = 2;
+}
+
+// ============================================================================
+// Trainee Messages
+// ============================================================================
+
+message Trainee {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4; // Only for create operations
+  string timezone = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message TraineeWithoutPassword {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string timezone = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message ListTraineesRequest {
+  string token = 1;
+  PaginationRequest pagination = 2;
+}
+
+message ListTraineesResponse {
+  repeated TraineeWithoutPassword data = 1;
+  PaginationResponse pagination = 2;
+}
+
+message CreateTraineeRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+  string timezone = 4;
+}
+
+message CreateTraineeResponse {
+  TraineeWithoutPassword trainee = 1;
+}
+
+message GetTraineeRequest {
+  string token = 1;
+  string trainee_id = 2;
+}
+
+message GetTraineeResponse {
+  TraineeWithoutPassword trainee = 1;
+}
+
+message UpdateTraineeRequest {
+  string token = 1;
+  string trainee_id = 2;
+  optional string name = 3;
+  optional string email = 4;
+  optional string password = 5;
+  optional string timezone = 6;
+}
+
+message UpdateTraineeResponse {
+  TraineeWithoutPassword trainee = 1;
+}
+
+message DeleteTraineeRequest {
+  string token = 1;
+  string trainee_id = 2;
+}
+
+message DeleteTraineeResponse {
+  bool success = 1;
+}
+
+// ============================================================================
+// Session/Authentication Messages
+// ============================================================================
+
+message CreateSessionRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message CreateSessionResponse {
+  string token = 1;
+  TraineeWithoutPassword trainee = 2;
+}
+
+message DeleteSessionRequest {
+  string token = 1;
+}
+
+message DeleteSessionResponse {
+  string message = 1;
+}
+
+message CheckSessionRequest {
+  string token = 1;
+}
+
+message CheckSessionResponse {
+  bool authenticated = 1;
+  TraineeWithoutPassword trainee = 2;
+}
+
+// ============================================================================
+// Workout Messages
+// ============================================================================
+
+message Workout {
+  string id = 1;
+  string name = 2;
+  int32 duration = 3;
+  string description = 4;
+  string color = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message ListWorkoutsRequest {
+  string token = 1;
+}
+
+message ListWorkoutsResponse {
+  repeated Workout workouts = 1;
+}
+
+message CreateWorkoutRequest {
+  string token = 1;
+  string name = 2;
+  int32 duration = 3;
+  string description = 4;
+  string color = 5;
+}
+
+message CreateWorkoutResponse {
+  Workout workout = 1;
+}
+
+message GetWorkoutRequest {
+  string token = 1;
+  string workout_id = 2;
+}
+
+message GetWorkoutResponse {
+  Workout workout = 1;
+}
+
+message UpdateWorkoutRequest {
+  string token = 1;
+  string workout_id = 2;
+  optional string name = 3;
+  optional int32 duration = 4;
+  optional string description = 5;
+  optional string color = 6;
+}
+
+message UpdateWorkoutResponse {
+  Workout workout = 1;
+}
+
+message DeleteWorkoutRequest {
+  string token = 1;
+  string workout_id = 2;
+}
+
+message DeleteWorkoutResponse {
+  bool success = 1;
+}
+
+// ============================================================================
+// Routine Messages
+// ============================================================================
+
+message TimeSlot {
+  string day = 1;
+  string start_time = 2;
+  string end_time = 3;
+}
+
+message Routine {
+  string id = 1;
+  string user_id = 2;
+  repeated TimeSlot availability = 3;
+  TraineeWithoutPassword trainee = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message ListRoutinesRequest {
+  string token = 1;
+  optional string trainee_id = 2;
+}
+
+message ListRoutinesResponse {
+  repeated Routine routines = 1;
+}
+
+message CreateRoutineRequest {
+  string token = 1;
+  string user_id = 2;
+  repeated TimeSlot availability = 3;
+}
+
+message CreateRoutineResponse {
+  Routine routine = 1;
+}
+
+message GetTraineeRoutineRequest {
+  string token = 1;
+  string trainee_id = 2;
+}
+
+message GetTraineeRoutineResponse {
+  Routine routine = 1;
+}
+
+message UpdateTraineeRoutineRequest {
+  string token = 1;
+  string trainee_id = 2;
+  repeated TimeSlot availability = 3;
+}
+
+message UpdateTraineeRoutineResponse {
+  Routine routine = 1;
+}
+
+message DeleteTraineeRoutineRequest {
+  string token = 1;
+  string trainee_id = 2;
+}
+
+message DeleteTraineeRoutineResponse {
+  bool success = 1;
+}
+
+// ============================================================================
+// Registration Messages
+// ============================================================================
+
+message Registration {
+  string id = 1;
+  string event_id = 2;
+  string user_id = 3;
+  string invitee_email = 4;
+  google.protobuf.Timestamp start_time = 5;
+  google.protobuf.Timestamp end_time = 6;
+  string status = 7;
+  TraineeWithoutPassword trainee = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+message ListRegistrationsRequest {
+  string token = 1;
+}
+
+message ListRegistrationsResponse {
+  repeated Registration registrations = 1;
+}
+
+message CreateRegistrationRequest {
+  string token = 1;
+  string event_id = 2;
+  string user_id = 3;
+  string invitee_email = 4;
+  google.protobuf.Timestamp start_time = 5;
+  google.protobuf.Timestamp end_time = 6;
+  string status = 7;
+}
+
+message CreateRegistrationResponse {
+  Registration registration = 1;
+}
+
+message GetRegistrationRequest {
+  string token = 1;
+  string registration_id = 2;
+}
+
+message GetRegistrationResponse {
+  Registration registration = 1;
+}
+
+message UpdateRegistrationRequest {
+  string token = 1;
+  string registration_id = 2;
+  optional string event_id = 3;
+  optional string user_id = 4;
+  optional string invitee_email = 5;
+  optional google.protobuf.Timestamp start_time = 6;
+  optional google.protobuf.Timestamp end_time = 7;
+  optional string status = 8;
+}
+
+message UpdateRegistrationResponse {
+  Registration registration = 1;
+}
+
+message DeleteRegistrationRequest {
+  string token = 1;
+  string registration_id = 2;
+}
+
+message DeleteRegistrationResponse {
+  bool success = 1;
+}
+
+// ============================================================================
+// gRPC Services
+// ============================================================================
+
+// Session management service
+service SessionService {
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+  rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse);
+  rpc CheckSession(CheckSessionRequest) returns (CheckSessionResponse);
+}
+
+// Trainee management service
+service TraineeService {
+  rpc ListTrainees(ListTraineesRequest) returns (ListTraineesResponse);
+  rpc CreateTrainee(CreateTraineeRequest) returns (CreateTraineeResponse);
+  rpc GetTrainee(GetTraineeRequest) returns (GetTraineeResponse);
+  rpc UpdateTrainee(UpdateTraineeRequest) returns (UpdateTraineeResponse);
+  rpc DeleteTrainee(DeleteTraineeRequest) returns (DeleteTraineeResponse);
+}
+
+// Workout management service
+service WorkoutService {
+  rpc ListWorkouts(ListWorkoutsRequest) returns (ListWorkoutsResponse);
+  rpc CreateWorkout(CreateWorkoutRequest) returns (CreateWorkoutResponse);
+  rpc GetWorkout(GetWorkoutRequest) returns (GetWorkoutResponse);
+  rpc UpdateWorkout(UpdateWorkoutRequest) returns (UpdateWorkoutResponse);
+  rpc DeleteWorkout(DeleteWorkoutRequest) returns (DeleteWorkoutResponse);
+}
+
+// Routine management service
+service RoutineService {
+  rpc ListRoutines(ListRoutinesRequest) returns (ListRoutinesResponse);
+  rpc CreateRoutine(CreateRoutineRequest) returns (CreateRoutineResponse);
+  rpc GetTraineeRoutine(GetTraineeRoutineRequest) returns (GetTraineeRoutineResponse);
+  rpc UpdateTraineeRoutine(UpdateTraineeRoutineRequest) returns (UpdateTraineeRoutineResponse);
+  rpc DeleteTraineeRoutine(DeleteTraineeRoutineRequest) returns (DeleteTraineeRoutineResponse);
+}
+
+// Registration management service
+service RegistrationService {
+  rpc ListRegistrations(ListRegistrationsRequest) returns (ListRegistrationsResponse);
+  rpc CreateRegistration(CreateRegistrationRequest) returns (CreateRegistrationResponse);
+  rpc GetRegistration(GetRegistrationRequest) returns (GetRegistrationResponse);
+  rpc UpdateRegistration(UpdateRegistrationRequest) returns (UpdateRegistrationResponse);
+  rpc DeleteRegistration(DeleteRegistrationRequest) returns (DeleteRegistrationResponse);
+}
